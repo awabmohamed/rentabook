@@ -1,17 +1,27 @@
 import React, { useState } from 'react';
-import axios from '../axiosConfig';  
+import axios from '../axiosConfig';
 
 const BookDetails = ({ book }) => {
   const [rented, setRented] = useState(false);
-  const [user, setUser] = useState('');
+  const [userName, setUserName] = useState('');
 
   const handleRent = () => {
+    if (!userName) {
+      alert("Please enter your name.");
+      return;
+    }
+
     axios.post('rentals/', {
-      user: user,
+      user_name: userName,
       book: book.id,
     })
-    .then(response => setRented(true))
-    .catch(error => console.error('Error renting book:', error));
+    .then(response => {
+      setRented(true);
+      console.log("Rental response:", response.data);
+    })
+    .catch(error => {
+      console.error('Error renting book:', error.response ? error.response.data : error.message);
+    });
   };
 
   return (
@@ -25,8 +35,8 @@ const BookDetails = ({ book }) => {
           <input
             type="text"
             placeholder="Enter your name"
-            value={user}
-            onChange={e => setUser(e.target.value)}
+            value={userName}
+            onChange={e => setUserName(e.target.value)}
           />
           <button onClick={handleRent}>Rent Book</button>
         </div>
